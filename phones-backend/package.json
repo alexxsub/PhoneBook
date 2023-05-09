@@ -13,8 +13,8 @@
   "type": "module",
   "dependencies": {
     "@apollo/server": "^4.7.0",
-    "crypto": "^1.0.1",
-    "graphql": "^16.6.0"
+    "graphql": "^16.6.0",
+    "mongoose": "^7.1.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.22"
