@@ -5,7 +5,7 @@
 Бэкенд серевер Apollo на GRaphQL с хранением данных в MongoDB
 
 ## phones-frontend
-Простой в оформлении фронтенд, HTNL+Vue
+Простой в оформлении фронтенд, HTML+Vue
 
 ## phones-frontend-quasar
-Фронтенд в стиле material а фреймворке Quasar
+Фронтенд в стиле material design на фреймворке Quasar
