@@ -15,7 +15,7 @@
 [Инструменты fullstack разработки](https://github.com/alexxsub/fullstack-awesome)
 
 ## Видеоуроки по разработке fullstack
-ПодробноеВидеоуроки по разработке этого приложения
+Подробные видеоуроки по разработке этого приложения
 
 - [#0 Анонс](https://youtu.be/o-X0en8cjx4)
 - [#1 Обоснование инструментов](https://youtu.be/c7IZshESnjk)
