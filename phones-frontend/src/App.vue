@@ -73,7 +73,7 @@ function resetPhone() {
 function deletePhone(item) {
  //описываем на gql языке запрос на удаление
 const DELETE_PHONE = gql`
-mutation deletePhone ($id: String!) {
+mutation deletePhone ($id: ID!) {
   deletePhone (id: $id) {
           id,
           number,
