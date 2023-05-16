@@ -13,7 +13,9 @@
   "type": "module",
   "dependencies": {
     "@apollo/server": "^4.7.0",
+    "@graphql-tools/load-files": "^6.6.1",
     "graphql": "^16.6.0",
+    "graphql-tools": "^8.3.20",
     "mongoose": "^7.1.0"
   },
   "devDependencies": {

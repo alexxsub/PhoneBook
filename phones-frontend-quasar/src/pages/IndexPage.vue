@@ -12,9 +12,8 @@ import { useQuery } from '@vue/apollo-composable'
 //подключаем диалог из плагина, будем спрашивать удаление
 const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent();
 
-//для языка sdl
-import gql from 'graphql-tag'
-
+//импортируем запросы
+import {READ_PHONES,CREATE_PHONE,UPDATE_PHONE,DELETE_PHONE} from '../queries/Phone.js'
 
 //глобальная переменная на простраство квазар
 const $q = useQuasar()
@@ -59,46 +58,7 @@ const columns = [
  }
 ];
 
-//Описание GraphQL запросы на sdl языке
-//sdl запрос на чтение
-const READ_PHONES = gql`
-      query readPhones {
-        readPhones {
-          id,
-          number
-          name
-        }
-      }
-    `;
-//описываем на sdl языке запрос на добавление
-const CREATE_PHONE = gql`
-mutation createPhone ($input:inputPhone!) {
-  createPhone (input: $input) {
-          id,
-          number,
-          name
-        }
-}`;
-//описываем на sdl языке запрос на обновление
-//в качестве входного параметра объект по структуре как state.inputPhone
-const UPDATE_PHONE = gql`
-mutation updatePhone ($input:inputPhone!) {
-  updatePhone (input: $input) {
-          id,
-          number,
-          name
-        }
-}`;
 
-//описываем на sdl языке запрос на удаление
-const DELETE_PHONE = gql`
-mutation deletePhone ($id: ID!) {
-  deletePhone (id: $id) {
-          id,
-          number,
-          name
-        }
-}`;
   
 
   //читаем данные, запрос на бэкенд 
@@ -135,17 +95,6 @@ const deletePhone = async (variables) =>
                    })
                     )
             },
-            /*update: (cache, {data}) => {
-                //читаем кэш            
-                const {readPhones} = cache.readQuery({ query: READ_PHONES })
-                //удаляем запись из кэша
-                cache.writeQuery({ query: READ_PHONES,
-                    data:{
-                        //перебираем массив и при совпадении id удаляем элемент из массива кэша
-                        readPhones: readPhones.filter(phone=>phone.id!==data.deletePhone.id)
-                       }
-                      })
-                  }*/
             })
         .then((response) => 
               $q.notify({
