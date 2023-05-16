@@ -39,5 +39,5 @@ async function StartApollo(){
   .then(({ url } ) =>console.log(`🚀  Apollo GraphQL server ready at: ${url}`));
 };
 
-ConnetMongoDB().catch(err => console.error(err))
-StartApollo().catch(err => console.error(err))
+ConnetMongoDB().catch(err => console.error(err.message))
+StartApollo().catch(err => console.error(err.message))
