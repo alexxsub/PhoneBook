@@ -34,7 +34,7 @@ mutation updatePhone ($input:inputPhone!) {
 
 //описываем на sdl языке запрос на удаление
 export const DELETE_PHONE = gql`
-mutation deletePhone ($id: ID!) {
+mutation deletePhone ($id: String!) {
   deletePhone (id: $id) {
           id,
           number,
