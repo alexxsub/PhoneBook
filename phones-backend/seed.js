@@ -1,7 +1,15 @@
 import mongoose from 'mongoose';
 import Phone from './models/Phone.js'
 
-const MONGO_URI = 'mongodb://localhost:27017/PhoneBook'
+//Получаем конфигурацию из .env
+import dotenv from 'dotenv';
+dotenv.config();
+
+export const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/PhoneBook',
+      HOST = process.env.HOST || 'localhost',
+      PORT = process.env.PORT || 9000;
+
+//подключаем базу
  mongoose
   .connect(MONGO_URI)
   .then(() => console.log(`🚀  Database started ${MONGO_URI}`))
