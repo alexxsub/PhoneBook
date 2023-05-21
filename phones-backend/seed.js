@@ -1,19 +1,5 @@
 import mongoose from 'mongoose';
-//описываем схему базы данных
-const PhoneSchema = new mongoose.Schema({
-  number: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true
-  },
-  name: {
-    type: String,
-    required: true
-  }
-})
-//подключаемся к базе данных
-const Phone = mongoose.model('Phone', PhoneSchema)
+import Phone from './models/Phone.js'
 
 const MONGO_URI = 'mongodb://localhost:27017/PhoneBook'
  mongoose
