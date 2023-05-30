@@ -8,3 +8,4 @@ const __dirname = path.dirname(__filename);
 
 const toMergeTypes = loadFilesSync(path.join(__dirname, '*.gql'))
 export default  mergeTypeDefs(toMergeTypes);
+        

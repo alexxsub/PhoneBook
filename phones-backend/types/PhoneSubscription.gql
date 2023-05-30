@@ -1,0 +1,5 @@
+type Subscription {
+    createdPhone: Phone,
+    deletedPhone: Phone,
+    updatedPhone: Phone
+}

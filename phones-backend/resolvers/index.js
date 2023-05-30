@@ -1,11 +1,14 @@
 // © 2023 Alexx Sub, https://github.com/alexxsub/PhoneBook
-//импортируем модель
-import  Phone from '../models/Phone.js';
+import { GraphQLError } from 'graphql';
+import { PubSub } from 'graphql-subscriptions';
+
+// публикатор сообщений
+const pubsub = new PubSub();
 
 // Описываем методы бэкенда
 export default {
     Query: {
-      readPhones: async () => {
+      readPhones: async (_,__,{Phone}) => {
         const phones = await Phone.find()
         // .limit(50)
   
@@ -13,22 +16,39 @@ export default {
       }
     },
     Mutation: {
-      createPhone:async (_, { input }) => {
-        const res = await new Phone( {
-          number:input.number,
-          name:input.name
-        }).save()
+      createPhone:async (_, { input },{Phone}) => {
+        delete input.id
+        const res = await new Phone( 
+          input
+        ).save()
+        .catch((e)=> {
+          if (e.code==11000)
+            throw new GraphQLError(`Номер ${input.number} уже есть базе`)
+          else 
+            throw new GraphQLError(e.message)
+        })
      
-        return res
+        if (res) {
+          pubsub.publish('createdPhone', { createdPhone: res });
+          return res;
+        }
+ 
       },
-      deletePhone: async (_, { id }) => {
-        const res = await Phone.findByIdAndRemove({
+      deletePhone: async (_, { id },{Phone}) => {
+        const res= await Phone.findByIdAndRemove({
           _id: id
         })
-  
-        return res
+        if (res)
+          {
+           pubsub.publish('deletedPhone', { deletedPhone: res });
+           return res
+          }
+         else 
+            throw new GraphQLError(`Записи с id ${id} нет в базе!`)
+         
+       
       },
-      updatePhone:async (_, { input }) => {
+      updatePhone:async (_, { input },{Phone}) => {
         const res = await Phone.findOneAndUpdate({
           _id: input.id
         }, {
@@ -40,7 +60,33 @@ export default {
           new: true
         }
         )
-        return res
+        if (res)
+        {
+          pubsub.publish('updatedPhone', { updatedPhone: res });
+          return data
+        }
+        else 
+            throw new GraphQLError(`Записи с номером ${input.number} нет в базе!`)
+      
+    },
+  },
+  // Подписки на изменения
+    Subscription: {
+      createdPhone: {
+        subscribe: ()=> {
+          return pubsub.asyncIterator(['createdPhone'])
+        }
+      },
+      updatedPhone: {
+        subscribe: ()=> {
+          return pubsub.asyncIterator(['updatedPhone'])
+        }
+      },
+      deletedPhone: {
+        subscribe: ()=>{
+          return pubsub.asyncIterator(['deletedPhone'])
+        }
+      }
     }
-  }
+
   };

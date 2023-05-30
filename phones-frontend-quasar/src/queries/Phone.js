@@ -41,3 +41,33 @@ mutation deletePhone ($id: String!) {
           name
         }
 }`;
+//Запросы на подписку
+export const CREATED_PHONE = gql`
+subscription createdPhone {
+  createdPhone {
+    id
+    name
+    number
+  }
+}
+`;
+
+export const UPDATED_PHONE = gql`
+subscription updatedPhone {
+  updatedPhone {
+    id
+    name
+    number
+  }
+}
+`;
+
+export const DELETED_PHONE = gql`
+subscription deletedPhone {
+  deletedPhone {
+    id
+    name
+    number
+  }
+}
+`;

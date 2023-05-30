@@ -1,43 +1,44 @@
 type Phone {
-    """
-    id записи
-    """
-    id: ID
-    """
-    Номмер телефона
-    """
-    number: String
-    """
-    Имя владельца телефона
-    """
-    name: String
-  }
+  """
+  id записи
+  """
+  id: ID
+  """
+  Номмер телефона
+  """
+  number: String
+  """
+  Имя владельца телефона
+  """
+  name: String
+}
 """
 Получить список всех телефонов
 """
 type Query {
-    readPhones: [Phone]
-  } 
+  readPhones: [Phone]
+}
 """
 Специальный тип данных для ввода
 """
 input inputPhone {
-    id:ID
-    number: String!
-    name: String
-  }
+  id: String
+  number: String!
+  name: String
+}
 
 type Mutation {
   """
-  Добавить запись телефона 
+  Добавить запись телефона
   """
-createPhone(input: inputPhone): Phone 
+  createPhone(input: inputPhone): Phone
   """
   Удалить запись о телефоне
   """
-deletePhone(id: ID): Phone
+  deletePhone(id: String): Phone
   """
   Обновить запись о телефоне
   """
-updatePhone(input: inputPhone): Phone 
+  updatePhone(input: inputPhone): Phone
 }
+
