@@ -12,8 +12,14 @@ import { useQuery } from '@vue/apollo-composable'
 //подключаем диалог из плагина, будем спрашивать удаление
 const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent();
 
-//импортируем запросы
-import {READ_PHONES,CREATE_PHONE,UPDATE_PHONE,DELETE_PHONE} from '../queries/Phone.js'
+//импортируем GraphQL запросы
+import {READ_PHONES,
+        CREATE_PHONE,
+        UPDATE_PHONE,
+        DELETE_PHONE,
+        CREATED_PHONE,
+        UPDATED_PHONE,
+        DELETED_PHONE} from '../queries/Phone.js'
 
 //глобальная переменная на простраство квазар
 const $q = useQuasar()
@@ -62,7 +68,38 @@ const columns = [
   
 
   //читаем данные, запрос на бэкенд 
-const { result,loading } = useQuery(READ_PHONES)
+const { result,loading, subscribeToMore} = useQuery(READ_PHONES)
+
+const onCreatedPhone = subscribeToMore({
+        document: CREATED_PHONE,
+        updateQuery: (previousData, { subscriptionData }) => {
+          return {
+            readPhones: [...previousData.readPhones, subscriptionData.data.createdPhone]
+          }
+        }
+      })
+const onUpdatedPhon = subscribeToMore({
+        document: UPDATED_PHONE,
+        updateQuery: (previousData, { subscriptionData }) => {
+          const id = subscriptionData.data.updatedPhone.id
+          const res = previousData.readPhones.map(el => {
+            if (el.id === id) return subscriptionData.data.updatedPhone
+          })
+          return {
+            readPhones: [...res]
+          }
+        }
+      })
+const onDeletedPhon = subscribeToMore({
+        document: DELETED_PHONE,
+        updateQuery: (previousData, { subscriptionData }) => {
+          const id = subscriptionData.data.deletedPhone.id
+          return {
+            readPhones: previousData.readPhones.filter((i) => i.id !== id)
+          }
+        }
+      },
+    )
 
 //обновляем статус загрузки
 watch(loading,(value) =>{
@@ -86,15 +123,7 @@ const deletePhone = async (variables) =>
     apolloClient
         .mutate({
             mutation: DELETE_PHONE,
-            variables,
-            update:(cache,{ data })=>{
-              cache.updateQuery({query: READ_PHONES},
-              (cache) => ( {
-                  ...cache,
-                    readPhones: cache.readPhones.filter((i) => i.id !== data.deletePhone.id),
-                   })
-                    )
-            },
+            variables
             })
         .then((response) => 
               $q.notify({
@@ -163,19 +192,7 @@ const handleClickOk = () => {
     apolloClient
         .mutate({
             mutation: CREATE_PHONE,
-            variables,   
-            update: (cache,{ data: {createPhone } }) => {
-                  
-                  //https://www.apollographql.com/docs/react/local-state/local-state-management
-                  //https://v4.apollo.vuejs.org/guide-composable/mutation.html#making-all-other-cache-updates
-
-                  const data = cache.readQuery({ query: READ_PHONES })
-                  cache.writeQuery({ query: READ_PHONES,
-                  data:{
-                    readPhones:[...data.readPhones,createPhone]
-                  }  }) 
-
-                }
+            variables
             })
         .then((response) =>{ 
               $q.notify({          

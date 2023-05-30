@@ -63,7 +63,7 @@ export default {
         if (res)
         {
           pubsub.publish('updatedPhone', { updatedPhone: res });
-          return data
+          return res
         }
         else 
             throw new GraphQLError(`Записи с номером ${input.number} нет в базе!`)
