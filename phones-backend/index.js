@@ -55,6 +55,32 @@ const wsServer = new WebSocketServer({
   server: httpServer,
   path: API_URI,
 });
+// активация вебсокет сервера
+wsServer .on('listening', ()=> {
+  console.log('\u{1F680} WebSocketServer is now listening!');
+});
+// подключение клиентов
+wsServer.on('connection', (ws,req) => {
+  const ip = req.socket.remoteAddress;
+  console.log(`\u{1F60A} connected to ws from:${ip}`);
+  
+  ws.on('error', console.error);
+
+  ws.on('message', function message(data) {
+    //  console.log(`received: ${data}`);
+  });
+
+
+
+});
+// подключение клиентов
+wsServer.on('connection', function connection(ws,req) {
+  const ip = req.socket.remoteAddress;
+  console.log(`\u{1F60A} connected to ws from:${ip}`);
+  
+
+
+});
 
 //создаем схему  на основе типов и резолверов
 const schema = makeExecutableSchema({ typeDefs, resolvers });
@@ -81,6 +107,7 @@ const apolloServer = new ApolloServer({
       },
     },
     {
+      //логирование GraphQL запросов
       async requestDidStart(requestContext) {
         // console.log('Request started! Query:\n' + requestContext.request.query);
 
@@ -122,7 +149,7 @@ app.use('/', express.static('../phones-frontend-quasar/dist/spa'));
 
 // стартуем сервер
   httpServer.listen(PORT,HOST, () => {
-    console.log(`\u{1F6F8} HTTPServer is now running on http://${HOST}:${PORT}/graphql`);
+    console.log(`\u{1F6F8} HTTPServer is now running on http://${HOST}:${PORT}${API_URI}`);
   });
 };
 

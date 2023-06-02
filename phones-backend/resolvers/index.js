@@ -38,13 +38,16 @@ export default {
         const res= await Phone.findByIdAndRemove({
           _id: id
         })
+        .catch((e)=> {
+          throw new GraphQLError(e.message)
+        })
         if (res)
           {
            pubsub.publish('deletedPhone', { deletedPhone: res });
            return res
           }
-         else 
-            throw new GraphQLError(`Записи с id ${id} нет в базе!`)
+          else 
+             throw new GraphQLError(`Записи с id ${id} нет в базе!`)
          
        
       },
@@ -58,8 +61,10 @@ export default {
           }
         }, {
           new: true
-        }
-        )
+        })
+        .catch((e)=> {
+          throw new GraphQLError(e.message)
+        })
         if (res)
         {
           pubsub.publish('updatedPhone', { updatedPhone: res });

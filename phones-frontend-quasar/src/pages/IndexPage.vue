@@ -1,12 +1,12 @@
 <script setup>
-import { reactive,computed,watch,ref } from 'vue';
+import { reactive,computed,watch } from 'vue';
 
 //использование плагинов
 import { useQuasar, useDialogPluginComponent,Notify } from 'quasar'
 
 //клиент Apollo вариант 1
 import {apolloClient} from 'boot/apollo'
-//клиент Apollo  в варианте 2 
+//клиент Apollo  в варианте 2
 import { useQuery } from '@vue/apollo-composable'
 
 //подключаем диалог из плагина, будем спрашивать удаление
@@ -25,8 +25,8 @@ import {READ_PHONES,
 const $q = useQuasar()
 
 //объект состояния приложения
-const state = reactive({     
-  
+const state = reactive({
+
   loading: false, //статус активного запроса
   filter:'',//строка фильтра
   formTitle:'Добавить телефон', //заголовок формы редактирования
@@ -39,7 +39,7 @@ const state = reactive({
 
 //описание столбцов таблицы
 const columns = [
- 
+
  {
      align: 'left',
      field: 'number',
@@ -64,10 +64,7 @@ const columns = [
  }
 ];
 
-
-  
-
-  //читаем данные, запрос на бэкенд 
+//читаем данные, запрос на бэкенд
 const { result,loading, subscribeToMore} = useQuery(READ_PHONES)
 
 const onCreatedPhone = subscribeToMore({
@@ -111,9 +108,9 @@ const phones = computed(() => result.value?.readPhones ?? [])
 
 //настраиваемая подпись кнопки добавить от размера экрана
 const btnAddLabel = computed(() => {
-  if($q.screen.name=='xs') 
+  if($q.screen.name=='xs')
       return ''
-    else 
+    else
       return 'Добавить запись'
 });
 
@@ -125,7 +122,7 @@ const deletePhone = async (variables) =>
             mutation: DELETE_PHONE,
             variables
             })
-        .then((response) => 
+        .then((response) =>
               $q.notify({
               message: `Запись ${response.data?.deletePhone.number} удалена!`,
               color: 'positive',
@@ -160,21 +157,21 @@ $q.dialog({
 
 //обработка события на диалоге редактирования
 const handleClickOk = () => {
-  
-  if (state.inputPhone.id=='') 
+
+  if (state.inputPhone.id=='')
     addPhone(
         {
           input:state.inputPhone
         }
           );
-  else 
+  else
     updatePhone(
         {
           input:state.inputPhone
         }
           );
 
-    
+
   };
 
   const handleClickCancel = () => {
@@ -185,7 +182,7 @@ const handleClickOk = () => {
               color: 'negative',
               icon: 'done'
             })
-   
+
       };
 
   const addPhone = async (variables) =>
@@ -194,8 +191,8 @@ const handleClickOk = () => {
             mutation: CREATE_PHONE,
             variables
             })
-        .then((response) =>{ 
-              $q.notify({          
+        .then((response) =>{
+              $q.notify({
               message: `Запись ${response.data?.createPhone.number} добавлена!`,
               color: 'positive',
               icon: 'done'
@@ -266,7 +263,7 @@ function resetPhone() {
 
 <template>
   <q-page >
-    <q-table 
+    <q-table
       :columns="columns"
       :loading="state.loading"
       :filter="state.filter"
@@ -287,7 +284,7 @@ function resetPhone() {
         <q-btn
           color="primary"
           icon="add"
-          :label="btnAddLabel"   
+          :label="btnAddLabel"
           @click="addRow"
         />
     </template>
@@ -303,7 +300,7 @@ function resetPhone() {
          <q-td key="actions" :props="props">
               <q-btn  color="red" round icon="delete" @click="deleteRow(props.row.id)"></q-btn>
             </q-td>
-        </q-tr>       
+        </q-tr>
     </template>
     </q-table>
   </q-page>
