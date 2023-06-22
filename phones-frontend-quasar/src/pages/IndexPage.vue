@@ -299,12 +299,9 @@ function resetPhone() {
           <q-td colspan="100%">
                 <div class="row">
                   <div class="column col-10" >
-                    <div>
-                        <div class="text-left">{{ props.row.address }}.</div>
-                    </div>
+                        <p class="text-left">{{ props.row.address }}.</p>
                   </div>
                   <div class="column col-2" >
-                    <div>
                       <q-btn
                         size="sm"
                         rounded
@@ -313,7 +310,6 @@ function resetPhone() {
                         icon="delete"
                         label="Удалить"
                         @click="deleteRow(props.row.id)" />
-                    </div>
                   </div>
                 </div>
           </q-td>
