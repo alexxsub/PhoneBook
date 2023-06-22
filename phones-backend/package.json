@@ -27,6 +27,7 @@
     "ws": "^8.13.0"
   },
   "devDependencies": {
-    "nodemon": "^2.0.22"
+    "nodemon": "^2.0.22",
+    "@faker-js/faker": "^8.0.2"
   }
 }

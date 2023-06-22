@@ -33,7 +33,8 @@ const state = reactive({
   inputPhone:{  //объект ввода данных
     id:'',
     number:'',
-    name:''
+    name:'',
+    address:''
   }
 });
 
@@ -45,7 +46,7 @@ const columns = [
      field: 'number',
      label: 'Телефон',
      name: 'number',
-     style: 'width: 40%;',
+     style: 'width: 50%;',
      sortable: true
  },
  {
@@ -53,14 +54,8 @@ const columns = [
      field: 'name',
      label: 'Имя',
      name: 'name',
-     style: 'width: 40%;',
+     style: 'width: 50%;',
      sortable: true
- },
- {
-   name: 'actions',
-   label: '',
-   field: 'actions',
-   style: 'width: 20%'
  }
 ];
 
@@ -241,7 +236,8 @@ function addRow(){
   dialogRef.value.show()
 };
 
-function editRow(row){
+function editRow(e,row){
+  e.stopPropagation()//останавливаем клик
   //передаем в объект редактирования запись из таблицы, что параметром прила
   state.inputPhone=Object.assign({}, row);
   //удаляем лишнее поле, которое служебное, но не описано в типе ввода input
@@ -272,9 +268,9 @@ function resetPhone() {
       no-results-label = "Ничего не найдено"
       style="height: 93vh"
     >
-      <!--кастомный заголовок таблицы, чтобы вставить поле поиска-->
+    <!--кастомный заголовок таблицы, чтобы вставить поле поиска-->
       <template v-slot:top>
-     <!-- <q-toolbar-title>Телефонная книга</q-toolbar-title> -->
+    <!-- <q-toolbar-title>Телефонная книга</q-toolbar-title> -->
       <q-input  dense debounce="300" color="primary" v-model="state.filter">
         <template v-slot:append>
             <q-icon name="search"></q-icon>
@@ -288,18 +284,39 @@ function resetPhone() {
           @click="addRow"
         />
     </template>
-     <!--кастомный шаблон тела таблицы, чтобы сделать в ячейке телефона ссылку-->
+    <!--кастомный шаблон тела таблицы, чтобы сделать в ячейке телефона ссылку-->
      <template v-slot:body="props">
-      <q-tr :props="props">
+      <q-tr :props="props" @click="props.expand = !props.expand">
          <q-td key="number" :props="props">
-             <a href="javascript:" @click="editRow(props.row)"> {{ props.row.number }}</a>
+             <a href="javascript:" @click="(event)=>editRow(event,props.row)"> {{ props.row.number }}</a>
         </q-td>
          <q-td key="name" :props="props">
               {{ props.row.name }}
         </q-td>
-         <q-td key="actions" :props="props">
-              <q-btn  color="red" round icon="delete" @click="deleteRow(props.row.id)"></q-btn>
-            </q-td>
+
+        </q-tr>
+        <q-tr v-show="props.expand" :props="props">
+          <q-td colspan="100%">
+                <div class="row">
+                  <div class="column col-10" >
+                    <div>
+                        <div class="text-left">{{ props.row.address }}.</div>
+                    </div>
+                  </div>
+                  <div class="column col-2" >
+                    <div>
+                      <q-btn
+                        size="sm"
+                        rounded
+                        flat
+                        color="negative"
+                        icon="delete"
+                        label="Удалить"
+                        @click="deleteRow(props.row.id)" />
+                    </div>
+                  </div>
+                </div>
+          </q-td>
         </q-tr>
     </template>
     </q-table>
@@ -311,7 +328,7 @@ function resetPhone() {
       <div class="q-pa-md" style="max-width: 500px">
         <q-toolbar class="bg-grey-2">
           <q-toolbar-title>{{state.formTitle}}</q-toolbar-title>
-        </q-toolbar>
+          </q-toolbar>
               <q-input
                        square
                        clearable
@@ -322,7 +339,7 @@ function resetPhone() {
                 <template v-slot:prepend>
                   <q-icon name="phone" />
                 </template>
-              </q-input>
+               </q-input>
                <q-input
                        square
                        clearable
@@ -333,7 +350,18 @@ function resetPhone() {
                 <template v-slot:prepend>
                   <q-icon name="person" />
                 </template>
-              </q-input>
+                </q-input>
+                <q-input
+                       square
+                       clearable
+                       v-model="state.inputPhone.address"
+                       lazy-rules
+                       :rules="[]"
+                       label="Адрес">
+                <template v-slot:prepend>
+                  <q-icon name="mail" />
+                </template>
+                </q-input>
       </div>
 
       <q-card-actions align="right">
@@ -344,5 +372,7 @@ function resetPhone() {
   </q-dialog>
 
 </template>
+
+
 
 

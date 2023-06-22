@@ -9,7 +9,7 @@ import { createClient } from "graphql-ws";
 //линк на вебсокет
 const wsLink = new GraphQLWsLink(
   createClient({
-    
+
     url: process.env.WS_URI ||
         'ws://localhost:9000/graphql',
   })
@@ -20,6 +20,7 @@ const httpLink = new createHttpLink({
         'http://localhost:9000/graphql',
 });
 // общий линк
+// первая ссылка используется, когда условие true, иначе вторая
 const link = split(
   ({ query }) => {
     const definition = getMainDefinition(query);
@@ -29,7 +30,7 @@ const link = split(
     );
   },
   wsLink,
-  httpLink,
+  httpLink
 );
 
 // экспортируем паратметры для подключения
@@ -41,6 +42,6 @@ export /* async */ function getClientOptions(/* {app, router, ...} */ options) {
       cache: new InMemoryCache(),
       connectToDevTools: true,
     },
- 
+
   )
 }

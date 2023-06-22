@@ -23,7 +23,7 @@ export default {
         ).save()
         .catch((e)=> {
           if (e.code==11000)
-            throw new GraphQLError(`Номер ${input.number} уже есть базе`)
+            throw new GraphQLError(`Номер ${input.number} уже есть в базе`)
           else 
             throw new GraphQLError(e.message)
         })
@@ -52,13 +52,13 @@ export default {
        
       },
       updatePhone:async (_, { input },{Phone}) => {
+        const _id =input.id
+        delete input.__typename
+        delete input.id
         const res = await Phone.findOneAndUpdate({
-          _id: input.id
+          _id
         }, {
-          $set: {
-            number: input.number,
-            name: input.name
-          }
+          $set: input
         }, {
           new: true
         })

@@ -11,6 +11,10 @@ type Phone {
   Имя владельца телефона
   """
   name: String
+  """
+  Адрес владельца телефона
+  """
+  address: String
 }
 """
 Получить список всех телефонов
@@ -25,6 +29,7 @@ input inputPhone {
   id: String
   number: String!
   name: String
+  address:String
 }
 
 type Mutation {
