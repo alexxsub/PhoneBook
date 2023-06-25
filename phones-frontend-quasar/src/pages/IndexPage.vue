@@ -298,10 +298,10 @@ function resetPhone() {
         <q-tr v-show="props.expand" :props="props">
           <q-td colspan="100%">
                 <div class="row">
-                  <div class="column col-10" >
+                  <div class="column col-11" >
                         <p class="text-left">{{ props.row.address }}.</p>
                   </div>
-                  <div class="column col-2" >
+                  <div class="column col-1" >
                       <q-btn
                         size="sm"
                         rounded
