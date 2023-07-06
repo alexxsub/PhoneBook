@@ -10,9 +10,12 @@
     "format": "prettier --write \"**/*.{js,vue,scss,html,md,json}\" --ignore-path .gitignore",
     "test": "echo \"No test specified\" && exit 0",
     "dev": "quasar dev",
-    "build": "quasar build"
+    "build": "quasar build",
+    "android:dev": "quasar dev -m capacitor -T android",
+    "android:build": "quasar build -m capacitor -T android -d"
   },
   "dependencies": {
+    "@capacitor/core": "^5.1.0",
     "@quasar/extras": "^1.0.0",
     "@vue/apollo-composable": "^4.0.0-beta.4",
     "graphql-tag": "^2.12.6",

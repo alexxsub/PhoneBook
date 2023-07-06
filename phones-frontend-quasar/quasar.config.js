@@ -11,9 +11,11 @@
 
 const { configure } = require('quasar/wrappers');
 
-
 module.exports = configure(function (/* ctx */) {
   return {
+    bin: {
+        linuxAndroidStudio: "/snap/android-studio/current/android-studio/bin/studio.sh"
+       } ,
     eslint: {
       // fix: true,
       // include: [],
@@ -78,7 +80,7 @@ module.exports = configure(function (/* ctx */) {
       // extendViteConf (viteConf) {},
       // viteVuePluginOptions: {},
 
-      
+
       // vitePlugins: [
       //   [ 'package-name', { ..options.. } ]
       // ]
@@ -87,6 +89,9 @@ module.exports = configure(function (/* ctx */) {
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
     devServer: {
       // https: true
+      // host:'alexx-hp',
+      // host:'localhost',
+      // host:'192.168.0.119',
       open: true // opens browser window automatically
     },
 
@@ -169,7 +174,8 @@ module.exports = configure(function (/* ctx */) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli/developing-capacitor-apps/configuring-capacitor
     capacitor: {
-      hideSplashscreen: true
+      hideSplashscreen: true,
+      androidScheme: "http"
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli/developing-electron-apps/configuring-electron

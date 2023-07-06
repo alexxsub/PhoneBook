@@ -1,5 +1,6 @@
 <script setup>
-import { reactive,computed,watch } from 'vue';
+import { reactive,computed,watch,ref} from 'vue';
+
 
 //использование плагинов
 import { useQuasar, useDialogPluginComponent,Notify } from 'quasar'
@@ -8,6 +9,17 @@ import { useQuasar, useDialogPluginComponent,Notify } from 'quasar'
 import {apolloClient} from 'boot/apollo'
 //клиент Apollo  в варианте 2
 import { useQuery } from '@vue/apollo-composable'
+
+let  prevDelBtn=undefined; //запоминаем последнюю кнопку удаления
+
+const pagination = ref({
+      sortBy: 'desc',
+      descending: false,
+      page: 2,
+      rowsPerPage: 11
+      // rowsNumber: xx if getting data from a server
+    })
+
 
 //подключаем диалог из плагина, будем спрашивать удаление
 const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent();
@@ -60,7 +72,7 @@ const columns = [
 ];
 
 //читаем данные, запрос на бэкенд
-const { result,loading, subscribeToMore} = useQuery(READ_PHONES)
+const { result,loading, refetch, subscribeToMore} = useQuery(READ_PHONES)
 
 const onCreatedPhone = subscribeToMore({
         document: CREATED_PHONE,
@@ -101,6 +113,8 @@ watch(loading,(value) =>{
 //массив с данными получаем с сервера  как результат выполнения запроса
 const phones = computed(() => result.value?.readPhones ?? [])
 
+const pagesNumber = computed(() => Math.ceil(phones.value.length / pagination.value.rowsPerPage))
+
 //настраиваемая подпись кнопки добавить от размера экрана
 const btnAddLabel = computed(() => {
   if($q.screen.name=='xs')
@@ -117,19 +131,21 @@ const deletePhone = async (variables) =>
             mutation: DELETE_PHONE,
             variables
             })
-        .then((response) =>
+        .then((response) =>{
+              prevDelBtn.style.right="-60px"
               $q.notify({
               message: `Запись ${response.data?.deletePhone.number} удалена!`,
               color: 'positive',
               icon: 'done'
               })
-        )
+            })
         .catch(error => {
               $q.notify({
               message: error.message,
               color: 'negative',
               icon: 'error'
             })
+
           });
 
 function deleteRow(id){
@@ -150,7 +166,11 @@ $q.dialog({
     }).onOk(() => deletePhone({id}))
 }
 
-//обработка события на диалоге редактирования
+function deleteSwipeRow(e,id){
+  e.stopPropagation()
+  deleteRow(id)
+}
+  //обработка события на диалоге редактирования
 const handleClickOk = () => {
 
   if (state.inputPhone.id=='')
@@ -255,6 +275,22 @@ function resetPhone() {
 
 };
 
+
+// обработчик свайпа
+function handleSwipe ({ evt, ...newInfo }) {
+
+        if (newInfo.direction=="left"){
+          evt.target.childNodes[1].style.right="0"
+          if(prevDelBtn) delBtn.style.right="-60px"
+          prevDelBtn =  evt.target.childNodes[1]
+        }
+        if (newInfo.direction=="right"){
+          evt.target.childNodes[1].style.right="-60px"
+
+        }
+}
+
+
 </script>
 
 <template>
@@ -266,7 +302,9 @@ function resetPhone() {
       :rows="phones"
       no-data-label="Нет данных"
       no-results-label = "Ничего не найдено"
-      style="height: 93vh"
+      style="height: 85vh"
+      v-model:pagination="pagination"
+      hide-pagination
     >
     <!--кастомный заголовок таблицы, чтобы вставить поле поиска-->
       <template v-slot:top>
@@ -276,6 +314,12 @@ function resetPhone() {
             <q-icon name="search"></q-icon>
         </template>
       </q-input>
+      <q-space />
+        <q-btn
+          color="secondary"
+          icon="refresh"
+          @click="refetch"
+        />
         <q-space />
         <q-btn
           color="primary"
@@ -286,18 +330,27 @@ function resetPhone() {
     </template>
     <!--кастомный шаблон тела таблицы, чтобы сделать в ячейке телефона ссылку-->
      <template v-slot:body="props">
-      <q-tr :props="props" @click="props.expand = !props.expand">
+      <q-tr :props="props" @click="props.expand = !props.expand"
+            v-touch-swipe.mouse.left.right="handleSwipe">
          <q-td key="number" :props="props">
              <a href="javascript:" @click="(event)=>editRow(event,props.row)"> {{ props.row.number }}</a>
         </q-td>
          <q-td key="name" :props="props">
               {{ props.row.name }}
+              <div v-if="$q.platform.is.mobile" class="swipepanel">
+                <q-btn
+
+                  color="negative"
+                  icon="delete"
+                  @click="(event)=>deleteSwipeRow(event,props.row.id)"/>
+              </div>
         </q-td>
 
         </q-tr>
         <q-tr v-show="props.expand" :props="props">
+
           <q-td colspan="100%">
-                <div class="row">
+                <div v-if="$q.platform.is.desktop" class="row">
                   <div class="column col-11" >
                         <p class="text-left">{{ props.row.address }}.</p>
                   </div>
@@ -311,15 +364,29 @@ function resetPhone() {
                         label="Удалить"
                         @click="deleteRow(props.row.id)" />
                   </div>
+
+                </div>
+                <div v-if="$q.platform.is.mobile" class="row">
+                  <div class="column " >
+                        <p class="text-left">{{ props.row.address }}.</p>
+                  </div>
                 </div>
           </q-td>
         </q-tr>
     </template>
-    </q-table>
-  </q-page>
 
-<!--Шаблон диалога скрыт и не отображается, вызывается из кода-->
-<q-dialog ref="dialogRef" @hide="onDialogHide">
+    </q-table>
+    <div class="row justify-center q-mt-md">
+    <q-pagination
+        v-model="pagination.page"
+        color="grey-8"
+        :max="5"
+        :max-pages="pagesNumber"
+        boundary-numbers
+      />
+    </div>
+    <!--Шаблон диалога скрыт и не отображается, вызывается из кода-->
+    <q-dialog ref="dialogRef" @hide="onDialogHide">
     <q-card class="q-dialog-plugin">
       <div class="q-pa-md" style="max-width: 500px">
         <q-toolbar class="bg-grey-2">
@@ -366,8 +433,23 @@ function resetPhone() {
       </q-card-actions>
     </q-card>
   </q-dialog>
+  </q-page>
+
+
 
 </template>
+<style>
+.swipepanel {
+  top: 5px;
+  right: -60px;
+  width: 60px;
+  height: 100%;
+  position: absolute;
+  transition: right .5s cubic-bezier(0, 0, 1, 1);
+}
+.scroll {
+overflow: hidden;}
+</style>
 
 
 

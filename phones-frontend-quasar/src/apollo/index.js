@@ -6,18 +6,24 @@ import { getMainDefinition } from "@apollo/client/utilities"
 import { createClient } from "graphql-ws";
 
 
+
+// ip a
+ const HOST = '192.168.0.119';
+//const HOST = process.env.SERVER
 //линк на вебсокет
 const wsLink = new GraphQLWsLink(
   createClient({
 
     url: process.env.WS_URI ||
-        'ws://localhost:9000/graphql',
+        `ws://${HOST}:9000/graphql`,
   })
 );
 // линк на http
+const uri = process.env.GRAPHQL_URI ||
+`http://${HOST}:9000/graphql`;
+console.log(uri)
 const httpLink = new createHttpLink({
-  uri:  process.env.GRAPHQL_URI ||
-        'http://localhost:9000/graphql',
+  uri
 });
 // общий линк
 // первая ссылка используется, когда условие true, иначе вторая
