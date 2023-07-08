@@ -155,3 +155,5 @@ app.use('/', express.static('../phones-frontend-quasar/dist/spa'));
 
 ConnetMongoDB().catch(err => console.log(err.message))
 StartApollo().catch(err => console.log(err.message))
+
+// sudo netstat -ntlp | grep 9000|awk '{print $7}'|cut -d "/" -f 1

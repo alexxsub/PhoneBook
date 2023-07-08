@@ -11,10 +11,13 @@
     "test": "echo \"No test specified\" && exit 0",
     "dev": "quasar dev",
     "build": "quasar build",
-    "android:dev": "quasar dev -m capacitor -T android",
-    "android:build": "quasar build -m capacitor -T android -d"
+    "capacitor:dev": "quasar dev -m capacitor -T android",
+    "capacitor:build": "quasar build -m capacitor -T android -d",
+    "cordova:dev": "quasar dev -m cordova -T android",
+    "cordova:build": "quasar build -m cordova -T android -d"
   },
   "dependencies": {
+    "@capacitor/app": "^5.0.5",
     "@capacitor/core": "^5.1.0",
     "@quasar/extras": "^1.0.0",
     "@vue/apollo-composable": "^4.0.0-beta.4",

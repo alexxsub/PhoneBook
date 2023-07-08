@@ -10,7 +10,7 @@ import {apolloClient} from 'boot/apollo'
 //клиент Apollo  в варианте 2
 import { useQuery } from '@vue/apollo-composable'
 
-let  prevDelBtn=undefined; //запоминаем последнюю кнопку удаления
+
 
 const pagination = ref({
       sortBy: 'desc',
@@ -276,12 +276,13 @@ function resetPhone() {
 };
 
 
+let  prevDelBtn=undefined; //запоминаем последнюю кнопку удаленияn
 // обработчик свайпа
 function handleSwipe ({ evt, ...newInfo }) {
 
         if (newInfo.direction=="left"){
           evt.target.childNodes[1].style.right="0"
-          if(prevDelBtn) delBtn.style.right="-60px"
+          if(prevDelBtn) prevDelBtn.style.right="-60px"
           prevDelBtn =  evt.target.childNodes[1]
         }
         if (newInfo.direction=="right"){
@@ -350,11 +351,11 @@ function handleSwipe ({ evt, ...newInfo }) {
         <q-tr v-show="props.expand" :props="props">
 
           <q-td colspan="100%">
-                <div v-if="$q.platform.is.desktop" class="row">
+                <div class="row">
                   <div class="column col-11" >
                         <p class="text-left">{{ props.row.address }}.</p>
                   </div>
-                  <div class="column col-1" >
+                  <div v-if="$q.platform.is.desktop"  class="column col-1" >
                       <q-btn
                         size="sm"
                         rounded
@@ -366,11 +367,7 @@ function handleSwipe ({ evt, ...newInfo }) {
                   </div>
 
                 </div>
-                <div v-if="$q.platform.is.mobile" class="row">
-                  <div class="column " >
-                        <p class="text-left">{{ props.row.address }}.</p>
-                  </div>
-                </div>
+
           </q-td>
         </q-tr>
     </template>
