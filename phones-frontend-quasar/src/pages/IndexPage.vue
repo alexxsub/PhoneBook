@@ -86,12 +86,9 @@ const onUpdatedPhon = subscribeToMore({
         document: UPDATED_PHONE,
         updateQuery: (previousData, { subscriptionData }) => {
           const id = subscriptionData.data.updatedPhone.id
-          const res = previousData.readPhones.map(el => {
-            if (el.id === id) return subscriptionData.data.updatedPhone
-            else return el
-          })
+          const readPhones = previousData.readPhones.map(el => el.id === id?subscriptionData.data.updatedPhone:el)
           return {
-            readPhones: [...res]
+            readPhones
           }
         }
       })
@@ -100,7 +97,7 @@ const onDeletedPhon = subscribeToMore({
         updateQuery: (previousData, { subscriptionData }) => {
           const id = subscriptionData.data.deletedPhone.id
           return {
-            readPhones: previousData.readPhones.filter((i) => i.id !== id)
+            readPhones: previousData.readPhones.filter((el) => el.id !== id)
           }
         }
       },
