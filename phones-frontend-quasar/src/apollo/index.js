@@ -8,7 +8,7 @@ import { createClient } from "graphql-ws";
 
 
 // ip a
- const HOST = '192.168.0.119';
+ const HOST = '192.168.0.114';
 //const HOST = process.env.SERVER
 //линк на вебсокет
 const wsLink = new GraphQLWsLink(

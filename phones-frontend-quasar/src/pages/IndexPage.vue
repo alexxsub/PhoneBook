@@ -88,6 +88,7 @@ const onUpdatedPhon = subscribeToMore({
           const id = subscriptionData.data.updatedPhone.id
           const res = previousData.readPhones.map(el => {
             if (el.id === id) return subscriptionData.data.updatedPhone
+            else return el
           })
           return {
             readPhones: [...res]
