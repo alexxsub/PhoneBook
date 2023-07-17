@@ -11,13 +11,13 @@ const wsLink = new GraphQLWsLink(
   createClient({
 
     url: process.env.WS_URI ||
-        'ws://localhost:9000/graphql',
+        'ws://localhost:9002/graphql',
   })
 );
 // линк на http
 const httpLink = new createHttpLink({
   uri:  process.env.GRAPHQL_URI ||
-        'http://localhost:9000/graphql',
+        'http://localhost:9002/graphql',
 });
 // общий линк
 // первая ссылка используется, когда условие true, иначе вторая
