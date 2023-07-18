@@ -1,0 +1,25 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// datasource db {
+//   provider = "mongodb"
+//   url      = env("DATABASE_URL")
+// }
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Phone {
+  // id     String @id @default(auto()) @map("_id") @db.ObjectId  //mongodb
+  // id     Int     @id @default(autoincrement())   //sql
+  id String  @id @default(uuid()) // для совметсимости с mongodb
+  number  String @unique
+  name    String
+  address String ?
+}
