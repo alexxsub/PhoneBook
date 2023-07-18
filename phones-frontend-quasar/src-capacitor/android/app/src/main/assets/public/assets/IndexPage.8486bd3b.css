@@ -1,0 +1,11 @@
+
+.swipepanel {
+  top: 5px;
+  right: -60px;
+  width: 60px;
+  height: 100%;
+  position: absolute;
+  transition: right .5s cubic-bezier(0, 0, 1, 1);
+}
+.scroll {
+overflow: hidden;}

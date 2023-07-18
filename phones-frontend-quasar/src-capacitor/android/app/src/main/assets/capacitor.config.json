@@ -1,0 +1,11 @@
+{
+	"appId": "org.capacitor.quasar.app",
+	"appName": "Телефонный справочник",
+	"bundledWebRuntime": false,
+	"npmClient": "npm",
+	"webDir": "www",
+	"server": {
+		"androidScheme": "http",
+		"url": "http://172.24.203.176:9500"
+	}
+}
