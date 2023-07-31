@@ -22,12 +22,12 @@ type Query {
 }
 
 type Mutation {
-  createPhone(PhoneInput: PhoneInput!): Phone!
-  updatePhone(PhoneInput: PhoneInput!): Phone!
+  createPhone(input: inputPhone!): Phone!
+  updatePhone(input: inputPhone!): Phone!
   deletePhone(id: String!): Phone!
 }
 
-input PhoneInput {
+input inputPhone {
   """ID редактируемой записи"""
   id: String!
 

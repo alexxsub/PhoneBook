@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { PhoneInput } from './dto/phone.input';
+import { inputPhone } from './dto/phone.input';
 import { PrismaService } from '../prisma.service';
 import { Phone } from '@prisma/client';
-// import { Phone } from './entities/phone.entity';
 
 @Injectable()
 export class PhoneService {
@@ -12,14 +11,14 @@ export class PhoneService {
     return this.prisma.phone.findMany();
   }
 
-  async create(input: PhoneInput): Promise<Phone> {
+  async create(input: inputPhone): Promise<Phone> {
     delete input.id;
     return this.prisma.phone.create({
       data: input,
     });
   }
 
-  async update(input: PhoneInput): Promise<Phone> {
+  async update(input: inputPhone): Promise<Phone> {
     const { id } = input;
     delete input.id;
     return this.prisma.phone.update({

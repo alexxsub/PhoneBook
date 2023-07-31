@@ -1,15 +1,15 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { PhoneService } from './phones.service';
 import { Phone } from './entities/phone.entity';
-import { PhoneInput } from './dto/phone.input';
+import { inputPhone } from './dto/phone.input';
 
 @Resolver(() => Phone)
 export class PhoneResolver {
   constructor(private readonly phoneService: PhoneService) {}
 
   @Mutation(() => Phone)
-  createPhone(@Args('PhoneInput') Input: PhoneInput) {
-    return this.phoneService.create(Input);
+  createPhone(@Args('input') input: inputPhone) {
+    return this.phoneService.create(input);
   }
 
   @Query(() => [Phone], { name: 'readPhones' })
@@ -18,8 +18,8 @@ export class PhoneResolver {
   }
 
   @Mutation(() => Phone)
-  updatePhone(@Args('PhoneInput') Input: PhoneInput) {
-    return this.phoneService.update(Input);
+  updatePhone(@Args('input') input: inputPhone) {
+    return this.phoneService.update(input);
   }
 
   @Mutation(() => Phone)

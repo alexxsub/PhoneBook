@@ -2,7 +2,7 @@ import { InputType, Field } from '@nestjs/graphql';
 import { IsNotEmpty, IsString, MaxLength, IsMongoId } from 'class-validator';
 
 @InputType()
-export class PhoneInput {
+export class inputPhone {
   @Field({ nullable: false, description: 'ID редактируемой записи' })
   @IsMongoId()
   id: string;
@@ -23,4 +23,4 @@ export class PhoneInput {
   address: string;
 }
 
-export default PhoneInput;
+export default inputPhone;
