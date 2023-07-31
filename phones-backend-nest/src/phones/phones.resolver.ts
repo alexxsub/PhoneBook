@@ -4,15 +4,15 @@ import { Resolver, Query, Mutation, Args, Subscription } from '@nestjs/graphql';
 import { PhoneService } from './phones.service';
 import { Phone } from './entities/phone.entity';
 import { inputPhone } from './dto/phone.input';
-import { ApiProperty } from '@nestjs/swagger';
 import { PubSub } from 'graphql-subscriptions';
 
+// создаем новый класс для публикации подписок
 const pubSub = new PubSub();
 
 @Resolver(() => Phone)
 export class PhoneResolver {
   constructor(private readonly phoneService: PhoneService) {}
-
+// описываем подписки через декораторы
   @Subscription(() => Phone)
   createdPhone() {
     return pubSub.asyncIterator('createdPhone');
@@ -25,7 +25,7 @@ export class PhoneResolver {
   deletedPhone() {
     return pubSub.asyncIterator('deletedPhone');
   }
-
+  // Creat RUD
   @Mutation(() => Phone)
   async createPhone(@Args('input') input: inputPhone) {
     const res = this.phoneService.create(input).catch((e) => {
@@ -34,13 +34,12 @@ export class PhoneResolver {
     pubSub.publish('createdPhone', { createdPhone: res });
     return res;
   }
-
-  @ApiProperty({ isArray: true, type: () => Phone }) // swagger
+  // C Read UD
   @Query(() => [Phone], { name: 'readPhones' })
   readPhones() {
     return this.phoneService.readPhones();
   }
-
+  // CR Update D
   @Mutation(() => Phone)
   async updatePhone(@Args('input') input: inputPhone) {
     const res = await this.phoneService.update(input).catch((e) => {
@@ -49,10 +48,10 @@ export class PhoneResolver {
     pubSub.publish('updatedPhone', { updatedPhone: res });
     return res;
   }
-
+  // CRU Delete
   @Mutation(() => Phone)
   async deletePhone(@Args('id') id: string) {
-    const res = await this.phoneService.remove(id).catch((e) => {
+    const res = await this.phoneService.delete(id).catch((e) => {
       throw new GraphQLError(e.message);
     });
     pubSub.publish('deletedPhone', { deletedPhone: res });

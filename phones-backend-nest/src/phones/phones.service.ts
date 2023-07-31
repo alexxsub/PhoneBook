@@ -7,15 +7,15 @@ import { Phone } from '@prisma/client';
 export class PhoneService {
   constructor(private prisma: PrismaService) {}
 
-  async readPhones(): Promise<Phone[]> {
-    return this.prisma.phone.findMany();
-  }
-
   async create(input: inputPhone): Promise<Phone> {
     delete input.id;
     return this.prisma.phone.create({
       data: input,
     });
+  }
+
+  async readPhones(): Promise<Phone[]> {
+    return this.prisma.phone.findMany();
   }
 
   async update(input: inputPhone): Promise<Phone> {
@@ -27,7 +27,7 @@ export class PhoneService {
     });
   }
 
-  async remove(id: string): Promise<Phone> {
+  async delete(id: string): Promise<Phone> {
     return this.prisma.phone.delete({
       where: { id },
     });
