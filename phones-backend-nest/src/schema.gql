@@ -40,3 +40,9 @@ input inputPhone {
   """Адресс владельца телефона """
   address: String!
 }
+
+type Subscription {
+  createdPhone: Phone!
+  updatedPhone: Phone!
+  deletedPhone: Phone!
+}

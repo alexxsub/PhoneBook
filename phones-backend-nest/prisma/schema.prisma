@@ -15,6 +15,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
+
 model Phone {
   // id     String @id @default(auto()) @map("_id") @db.ObjectId  //mongodb
   // id     Int     @id @default(autoincrement())   //sql

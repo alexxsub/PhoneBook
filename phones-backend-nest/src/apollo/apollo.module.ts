@@ -9,6 +9,7 @@ import { Context } from 'graphql-ws';
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
+      installSubscriptionHandlers: true,
       subscriptions: {
         'graphql-ws': {
           path: '/graphql',
