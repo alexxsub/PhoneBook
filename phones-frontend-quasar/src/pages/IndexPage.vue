@@ -1,281 +1,270 @@
 <script setup>
-import { reactive,computed,watch } from 'vue';
+import { reactive, computed, watch } from "vue";
 
 //использование плагинов
-import { useQuasar, useDialogPluginComponent,Notify } from 'quasar'
+import { useQuasar, useDialogPluginComponent, Notify } from "quasar";
 
 //клиент Apollo вариант 1
-import {apolloClient} from 'boot/apollo'
+import { apolloClient } from "boot/apollo";
 //клиент Apollo  в варианте 2
-import { useQuery } from '@vue/apollo-composable'
+import { useQuery } from "@vue/apollo-composable";
 
 //подключаем диалог из плагина, будем спрашивать удаление
-const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } = useDialogPluginComponent();
+const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
+  useDialogPluginComponent();
 
 //импортируем GraphQL запросы
-import {READ_PHONES,
-        CREATE_PHONE,
-        UPDATE_PHONE,
-        DELETE_PHONE,
-        CREATED_PHONE,
-        UPDATED_PHONE,
-        DELETED_PHONE} from '../queries/Phone.js'
+import {
+  READ_PHONES,
+  CREATE_PHONE,
+  UPDATE_PHONE,
+  DELETE_PHONE,
+  CREATED_PHONE,
+  UPDATED_PHONE,
+  DELETED_PHONE,
+} from "../queries/Phone.js";
 
 //глобальная переменная на простраство квазар
-const $q = useQuasar()
+const $q = useQuasar();
 
 //объект состояния приложения
 const state = reactive({
-
   loading: false, //статус активного запроса
-  filter:'',//строка фильтра
-  formTitle:'Добавить телефон', //заголовок формы редактирования
-  inputPhone:{  //объект ввода данных
-    id:'',
-    number:'',
-    name:'',
-    address:''
-  }
+  filter: "", //строка фильтра
+  formTitle: "Добавить телефон", //заголовок формы редактирования
+  inputPhone: {
+    //объект ввода данных
+    id: "",
+    number: "",
+    name: "",
+    address: "",
+  },
 });
 
 //описание столбцов таблицы
 const columns = [
-
- {
-     align: 'left',
-     field: 'number',
-     label: 'Телефон',
-     name: 'number',
-     style: 'width: 50%;',
-     sortable: true
- },
- {
-     align: 'left',
-     field: 'name',
-     label: 'Имя',
-     name: 'name',
-     style: 'width: 50%;',
-     sortable: true
- }
+  {
+    align: "left",
+    field: "number",
+    label: "Телефон",
+    name: "number",
+    style: "width: 50%;",
+    sortable: true,
+  },
+  {
+    align: "left",
+    field: "name",
+    label: "Имя",
+    name: "name",
+    style: "width: 50%;",
+    sortable: true,
+  },
 ];
 
 //читаем данные, запрос на бэкенд
-const { result,loading, subscribeToMore} = useQuery(READ_PHONES)
+const { result, loading, subscribeToMore } = useQuery(READ_PHONES);
 
 const onCreatedPhone = subscribeToMore({
-        document: CREATED_PHONE,
-        updateQuery: (previousData, { subscriptionData }) => {
-          return {
-            readPhones: [...previousData.readPhones, subscriptionData.data.createdPhone]
-          }
-        }
-      })
+  document: CREATED_PHONE,
+  updateQuery: (previousData, { subscriptionData }) => {
+    return {
+      readPhones: [
+        ...previousData.readPhones,
+        subscriptionData.data.createdPhone,
+      ],
+    };
+  },
+});
 const onUpdatedPhon = subscribeToMore({
-        document: UPDATED_PHONE,
-        updateQuery: (previousData, { subscriptionData }) => {
-          const id = subscriptionData.data.updatedPhone.id
-          const res = previousData.readPhones.map(el => {
-            if (el.id === id) return subscriptionData.data.updatedPhone
-          })
-          return {
-            readPhones: [...res]
-          }
-        }
-      })
+  document: UPDATED_PHONE,
+  updateQuery: (previousData, { subscriptionData }) => {
+    const id = subscriptionData.data.updatedPhone.id;
+    const res = previousData.readPhones.map((el) => {
+      if (el.id === id) return subscriptionData.data.updatedPhone;
+    });
+    return {
+      readPhones: [...res],
+    };
+  },
+});
 const onDeletedPhon = subscribeToMore({
-        document: DELETED_PHONE,
-        updateQuery: (previousData, { subscriptionData }) => {
-          const id = subscriptionData.data.deletedPhone.id
-          return {
-            readPhones: previousData.readPhones.filter((i) => i.id !== id)
-          }
-        }
-      },
-    )
+  document: DELETED_PHONE,
+  updateQuery: (previousData, { subscriptionData }) => {
+    const id = subscriptionData.data.deletedPhone.id;
+    return {
+      readPhones: previousData.readPhones.filter((i) => i.id !== id),
+    };
+  },
+});
 
 //обновляем статус загрузки
-watch(loading,(value) =>{
-  state.loading=value
-})
+watch(loading, (value) => {
+  state.loading = value;
+});
 
 //массив с данными получаем с сервера  как результат выполнения запроса
-const phones = computed(() => result.value?.readPhones ?? [])
+const phones = computed(() => result.value?.readPhones ?? []);
 
 //настраиваемая подпись кнопки добавить от размера экрана
 const btnAddLabel = computed(() => {
-  if($q.screen.name=='xs')
-      return ''
-    else
-      return 'Добавить запись'
+  if ($q.screen.name == "xs") return "";
+  else return "Добавить запись";
 });
-
 
 //запрос к бэкенду через Apollo клиент
 const deletePhone = async (variables) =>
-    apolloClient
-        .mutate({
-            mutation: DELETE_PHONE,
-            variables
-            })
-        .then((response) =>
-              $q.notify({
-              message: `Запись ${response.data?.deletePhone.number} удалена!`,
-              color: 'positive',
-              icon: 'done'
-              })
-        )
-        .catch(error => {
-              $q.notify({
-              message: error.message,
-              color: 'negative',
-              icon: 'error'
-            })
-          });
+  apolloClient
+    .mutate({
+      mutation: DELETE_PHONE,
+      variables,
+    })
+    .then((response) =>
+      $q.notify({
+        message: `Запись ${response.data?.deletePhone.number} удалена!`,
+        color: "positive",
+        icon: "done",
+      })
+    )
+    .catch((error) => {
+      $q.notify({
+        message: error.message,
+        color: "negative",
+        icon: "error",
+      });
+    });
 
-function deleteRow(id){
-
-$q.dialog({
-      title:'Удаление записи',
-      message: 'Уверены, что хотите удалить запись?',
-      focus: 'cancel',
-      ok:{
-        label:'Да',
-        color:'positive'
-      },
-      cancel:{
-        label:'Нет',
-        color:'negative'
-      }
-      //persistent: true //выключить закрытие диалога по esc
-    }).onOk(() => deletePhone({id}))
+function deleteRow(id) {
+  $q.dialog({
+    title: "Удаление записи",
+    message: "Уверены, что хотите удалить запись?",
+    focus: "cancel",
+    ok: {
+      label: "Да",
+      color: "positive",
+    },
+    cancel: {
+      label: "Нет",
+      color: "negative",
+    },
+    //persistent: true //выключить закрытие диалога по esc
+  }).onOk(() => deletePhone({ id }));
 }
 
 //обработка события на диалоге редактирования
 const handleClickOk = () => {
-
-  if (state.inputPhone.id=='')
-    addPhone(
-        {
-          input:state.inputPhone
-        }
-          );
+  if (state.inputPhone.id == "")
+    addPhone({
+      input: state.inputPhone,
+    });
   else
-    updatePhone(
-        {
-          input:state.inputPhone
-        }
-          );
+    updatePhone({
+      input: state.inputPhone,
+    });
+};
 
+const handleClickCancel = () => {
+  onDialogCancel();
+  //вариант создания уведомления через экземпляр класса
+  Notify.create({
+    message: "Заапись не сохранена!",
+    color: "negative",
+    icon: "done",
+  });
+};
 
-  };
-
-  const handleClickCancel = () => {
-      onDialogCancel()
-      //вариант создания уведомления через экземпляр класса
-      Notify.create({
-              message: 'Заапись не сохранена!',
-              color: 'negative',
-              icon: 'done'
-            })
-
-      };
-
-  const addPhone = async (variables) =>
-    apolloClient
-        .mutate({
-            mutation: CREATE_PHONE,
-            variables
-            })
-        .then((response) =>{
-              $q.notify({
-              message: `Запись ${response.data?.createPhone.number} добавлена!`,
-              color: 'positive',
-              icon: 'done'
-              })
-              onDialogOK();
-            }
-        )
-        .catch(error => {
-              $q.notify({
-              message: error.message,
-              color: 'negative',
-              icon: 'error'
-            })
-          });
+const addPhone = async (variables) =>
+  apolloClient
+    .mutate({
+      mutation: CREATE_PHONE,
+      variables,
+    })
+    .then((response) => {
+      $q.notify({
+        message: `Запись ${response.data?.createPhone.number} добавлена!`,
+        color: "positive",
+        icon: "done",
+      });
+      onDialogOK();
+    })
+    .catch((error) => {
+      $q.notify({
+        message: error.message,
+        color: "negative",
+        icon: "error",
+      });
+    });
 
 //обновление записи
 // variables - входящий параметр - state.inputPhone
 const updatePhone = async (variables) =>
-    apolloClient
-        .mutate({
-            mutation: UPDATE_PHONE,
-            variables,
-            })
-        .then((response) =>{
-              $q.notify({
-              message: `Запись ${response.data?.updatePhone.number} изменена!`,
-              color: 'positive',
-              icon: 'done'
-              });
-              onDialogOK();
-            }
-        )
-        .catch(error => {
-              $q.notify({
-              message: error.message,
-              color: 'negative',
-              icon: 'error'
-            })
-          });
+  apolloClient
+    .mutate({
+      mutation: UPDATE_PHONE,
+      variables,
+    })
+    .then((response) => {
+      $q.notify({
+        message: `Запись ${response.data?.updatePhone.number} изменена!`,
+        color: "positive",
+        icon: "done",
+      });
+      onDialogOK();
+    })
+    .catch((error) => {
+      $q.notify({
+        message: error.message,
+        color: "negative",
+        icon: "error",
+      });
+    });
 
-function addRow(){
+function addRow() {
   //обнуляем данные редактирования, у нас новая запись
-  resetPhone()
+  resetPhone();
   //меняем заголовок диалога
-  state.formTitle = 'Добавить запись'
-  dialogRef.value.show()
-};
+  state.formTitle = "Добавить запись";
+  dialogRef.value.show();
+}
 
-function editRow(e,row){
-  e.stopPropagation()//останавливаем клик
+function editRow(e, row) {
+  e.stopPropagation(); //останавливаем клик
   //передаем в объект редактирования запись из таблицы, что параметром прила
-  state.inputPhone=Object.assign({}, row);
+  state.inputPhone = Object.assign({}, row);
   //удаляем лишнее поле, которое служебное, но не описано в типе ввода input
-  delete  state.inputPhone.__typename
+  delete state.inputPhone.__typename;
   //меняем заголовок диалога
-  state.formTitle = 'Редактировать запись'
-  dialogRef.value.show()
-};
+  state.formTitle = "Редактировать запись";
+  dialogRef.value.show();
+}
 
 //обнуляем состояние приложения
 function resetPhone() {
-  for (var key in state.inputPhone) { // затираем объект редактирования , перебирая все элементы
-      state.inputPhone[key]=""
-    }
-
-};
-
+  for (var key in state.inputPhone) {
+    // затираем объект редактирования , перебирая все элементы
+    state.inputPhone[key] = "";
+  }
+}
 </script>
 
 <template>
-  <q-page >
+  <q-page>
     <q-table
       :columns="columns"
       :loading="state.loading"
       :filter="state.filter"
       :rows="phones"
       no-data-label="Нет данных"
-      no-results-label = "Ничего не найдено"
+      no-results-label="Ничего не найдено"
       style="height: 93vh"
     >
-    <!--кастомный заголовок таблицы, чтобы вставить поле поиска-->
+      <!--кастомный заголовок таблицы, чтобы вставить поле поиска-->
       <template v-slot:top>
-    <!-- <q-toolbar-title>Телефонная книга</q-toolbar-title> -->
-      <q-input  dense debounce="300" color="primary" v-model="state.filter">
-        <template v-slot:append>
+        <!-- <q-toolbar-title>Телефонная книга</q-toolbar-title> -->
+        <q-input dense debounce="300" color="primary" v-model="state.filter">
+          <template v-slot:append>
             <q-icon name="search"></q-icon>
-        </template>
-      </q-input>
+          </template>
+        </q-input>
         <q-space />
         <q-btn
           color="primary"
@@ -283,92 +272,92 @@ function resetPhone() {
           :label="btnAddLabel"
           @click="addRow"
         />
-    </template>
-    <!--кастомный шаблон тела таблицы, чтобы сделать в ячейке телефона ссылку-->
-     <template v-slot:body="props">
-      <q-tr :props="props" @click="props.expand = !props.expand">
-         <q-td key="number" :props="props">
-             <a href="javascript:" @click="(event)=>editRow(event,props.row)"> {{ props.row.number }}</a>
-        </q-td>
-         <q-td key="name" :props="props">
-              {{ props.row.name }}
-        </q-td>
-
+      </template>
+      <!--кастомный шаблон тела таблицы, чтобы сделать в ячейке телефона ссылку-->
+      <template v-slot:body="props">
+        <q-tr :props="props" @click="props.expand = !props.expand">
+          <q-td key="number" :props="props">
+            <a href="javascript:" @click="(event) => editRow(event, props.row)">
+              {{ props.row.number }}</a
+            >
+          </q-td>
+          <q-td key="name" :props="props">
+            {{ props.row.name }}
+          </q-td>
         </q-tr>
         <q-tr v-show="props.expand" :props="props">
           <q-td colspan="100%">
-                <div class="row">
-                  <div class="column col-11" >
-                        <p class="text-left">{{ props.row.address }}.</p>
-                  </div>
-                  <div class="column col-1" >
-                      <q-btn
-                        size="sm"
-                        rounded
-                        flat
-                        color="negative"
-                        icon="delete"
-                        label="Удалить"
-                        @click="deleteRow(props.row.id)" />
-                  </div>
-                </div>
+            <div class="row">
+              <div class="column col-11">
+                <p class="text-left">{{ props.row.address }}.</p>
+              </div>
+              <div class="column col-1">
+                <q-btn
+                  size="sm"
+                  rounded
+                  flat
+                  color="negative"
+                  icon="delete"
+                  label="Удалить"
+                  @click="deleteRow(props.row.id)"
+                />
+              </div>
+            </div>
           </q-td>
         </q-tr>
-    </template>
+      </template>
     </q-table>
-  </q-page>
 
-<!--Шаблон диалога скрыт и не отображается, вызывается из кода-->
-<q-dialog ref="dialogRef" @hide="onDialogHide">
-    <q-card class="q-dialog-plugin">
-      <div class="q-pa-md" style="max-width: 500px">
-        <q-toolbar class="bg-grey-2">
-          <q-toolbar-title>{{state.formTitle}}</q-toolbar-title>
+    <!--Шаблон диалога скрыт и не отображается, вызывается из кода-->
+    <q-dialog ref="dialogRef" @hide="onDialogHide">
+      <q-card class="q-dialog-plugin">
+        <div class="q-pa-md" style="max-width: 500px">
+          <q-toolbar class="bg-grey-2">
+            <q-toolbar-title>{{ state.formTitle }}</q-toolbar-title>
           </q-toolbar>
-              <q-input
-                       square
-                       clearable
-                       v-model="state.inputPhone.number"
-                       lazy-rules
-                       :rules="[]"
-                       label="Телефон">
-                <template v-slot:prepend>
-                  <q-icon name="phone" />
-                </template>
-               </q-input>
-               <q-input
-                       square
-                       clearable
-                       v-model="state.inputPhone.name"
-                       lazy-rules
-                       :rules="[]"
-                       label="Имя">
-                <template v-slot:prepend>
-                  <q-icon name="person" />
-                </template>
-                </q-input>
-                <q-input
-                       square
-                       clearable
-                       v-model="state.inputPhone.address"
-                       lazy-rules
-                       :rules="[]"
-                       label="Адрес">
-                <template v-slot:prepend>
-                  <q-icon name="mail" />
-                </template>
-                </q-input>
-      </div>
+          <q-input
+            square
+            clearable
+            v-model="state.inputPhone.number"
+            lazy-rules
+            :rules="[]"
+            label="Телефон"
+          >
+            <template v-slot:prepend>
+              <q-icon name="phone" />
+            </template>
+          </q-input>
+          <q-input
+            square
+            clearable
+            v-model="state.inputPhone.name"
+            lazy-rules
+            :rules="[]"
+            label="Имя"
+          >
+            <template v-slot:prepend>
+              <q-icon name="person" />
+            </template>
+          </q-input>
+          <q-input
+            square
+            clearable
+            v-model="state.inputPhone.address"
+            lazy-rules
+            :rules="[]"
+            label="Адрес"
+          >
+            <template v-slot:prepend>
+              <q-icon name="mail" />
+            </template>
+          </q-input>
+        </div>
 
-      <q-card-actions align="right">
-        <q-btn color="positive" label="Сохранить" @click="handleClickOk" />
-        <q-btn color="negative" label="Отмена" @click="handleClickCancel" />
-      </q-card-actions>
-    </q-card>
-  </q-dialog>
-
+        <q-card-actions align="right">
+          <q-btn color="positive" label="Сохранить" @click="handleClickOk" />
+          <q-btn color="negative" label="Отмена" @click="handleClickCancel" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+  </q-page>
 </template>
-
-
-
-

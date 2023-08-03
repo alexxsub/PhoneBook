@@ -1,0 +1,8 @@
+{
+  "mixers": [
+    {
+      "input": ["prisma/base.prisma", "./src/phones/phones.prisma"],
+      "output": "prisma/schema.prisma"
+    }
+  ]
+}
