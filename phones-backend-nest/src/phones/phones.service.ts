@@ -14,7 +14,7 @@ export class PhoneService {
     });
   }
 
-  async readPhones(): Promise<Phone[]> {
+  async read(): Promise<Phone[]> {
     return this.prisma.phone.findMany();
   }
 

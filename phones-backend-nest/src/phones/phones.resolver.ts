@@ -12,7 +12,7 @@ const pubSub = new PubSub();
 @Resolver(() => Phone)
 export class PhoneResolver {
   constructor(private readonly phoneService: PhoneService) {}
-// описываем подписки через декораторы
+  // описываем подписки через декораторы
   @Subscription(() => Phone)
   createdPhone() {
     return pubSub.asyncIterator('createdPhone');
@@ -37,7 +37,7 @@ export class PhoneResolver {
   // C Read UD
   @Query(() => [Phone], { name: 'readPhones' })
   readPhones() {
-    return this.phoneService.readPhones();
+    return this.phoneService.read();
   }
   // CR Update D
   @Mutation(() => Phone)
