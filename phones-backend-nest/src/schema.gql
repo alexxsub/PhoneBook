@@ -17,8 +17,52 @@ type Phone {
   address: String!
 }
 
+"""Записи телефонной книги, разбитые на страницы"""
+type PageInfo {
+  """Всего записей в таблице"""
+  rowsTotal: Int!
+
+  """Записей на страницу"""
+  rowsPerPage: Int!
+
+  """Последняя страница"""
+  lastPage: Int!
+
+  """Текущая страница"""
+  currentPage: Int!
+}
+
+"""Записи телефонной книги, разбитые на страницы"""
+type PaginatedPhones {
+  """Данные о записях"""
+  rows: [Phone!]
+
+  """Данные о страницах"""
+  pageinfo: PageInfo!
+}
+
 type Query {
-  readPhones: [Phone!]!
+  readPhones(
+    """Входные параметры"""
+    input: inputRead
+  ): PaginatedPhones
+}
+
+input inputRead {
+  """Строка поиска"""
+  filter: String!
+
+  """Поле сортировки """
+  sortBy: String!
+
+  """Направление сортировки """
+  descending: String!
+
+  """Записей на страницу"""
+  perPage: Float!
+
+  """Запрашиваемая страница"""
+  page: Float!
 }
 
 type Mutation {

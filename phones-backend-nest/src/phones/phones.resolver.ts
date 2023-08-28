@@ -3,7 +3,9 @@ import { GraphQLError } from 'graphql';
 import { Resolver, Query, Mutation, Args, Subscription } from '@nestjs/graphql';
 import { PhoneService } from './phones.service';
 import { Phone } from './entities/phone.entity';
+import { PaginatedPhones } from './entities/PaginatedPhones';
 import { inputPhone } from './dto/phone.input';
+import { inputRead } from './dto/read.input';
 import { PubSub } from 'graphql-subscriptions';
 
 // создаем новый класс для публикации подписок
@@ -35,9 +37,12 @@ export class PhoneResolver {
     return res;
   }
   // C Read UD
-  @Query(() => [Phone], { name: 'readPhones' })
-  readPhones() {
-    return this.phoneService.read();
+  @Query(() => PaginatedPhones, { nullable: true, name: 'readPhones' })
+  readPhones(
+    @Args('input', { nullable: true, description: 'Входные параметры' })
+    input: inputRead,
+  ) {
+    return this.phoneService.read(input);
   }
   // CR Update D
   @Mutation(() => Phone)

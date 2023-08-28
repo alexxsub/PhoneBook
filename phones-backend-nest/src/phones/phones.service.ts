@@ -1,7 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { inputPhone } from './dto/phone.input';
+import { inputRead } from './dto/read.input';
 import { PrismaService } from '../prisma.service';
-import { Phone } from '@prisma/client';
+import { Phone, Prisma } from '@prisma/client';
+
+// import { createPaginator } from 'prisma-pagination';
+
+import { createPaginator } from '../pagination';
 
 @Injectable()
 export class PhoneService {
@@ -14,8 +19,39 @@ export class PhoneService {
     });
   }
 
-  async read(): Promise<Phone[]> {
-    return this.prisma.phone.findMany();
+  async read(input: inputRead) {
+    if (input) {
+      const { perPage, page, filter, sortBy, descending } = input;
+      const orderBy = {};
+      if (descending && descending != '')
+        orderBy[sortBy] = Prisma.SortOrder[descending];
+
+      const paginate = createPaginator({ perPage });
+      const res = await paginate<Phone, Prisma.PhoneFindManyArgs>(
+        this.prisma.phone,
+        {
+          where: {
+            OR: [
+              {
+                name: {
+                  contains: filter,
+                },
+              },
+              {
+                number: {
+                  contains: filter,
+                },
+              },
+            ],
+          },
+          orderBy,
+        },
+        { page },
+      );
+
+      return res;
+    }
+    return await this.prisma.phone.findMany();
   }
 
   async update(input: inputPhone): Promise<Phone> {
