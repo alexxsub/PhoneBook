@@ -21,12 +21,12 @@ export class PhoneService {
 
   async read(input: inputRead) {
     if (input) {
-      const { perPage, page, filter, sortBy, descending } = input;
+      const { rowsPerPage, page, filter, sortBy, descending } = input;
       const orderBy = {};
       if (descending && descending != '')
         orderBy[sortBy] = Prisma.SortOrder[descending];
 
-      const paginate = createPaginator({ perPage });
+      const paginate = createPaginator({ rowsPerPage });
       const res = await paginate<Phone, Prisma.PhoneFindManyArgs>(
         this.prisma.phone,
         {

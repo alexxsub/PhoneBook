@@ -1,16 +1,15 @@
 export interface PaginatedResult<T> {
   rows: T[];
   pageinfo: {
-    rowsTotal: number;
-    rowsPerPage: number;
-    lastPage: number;
-    currentPage: number;
+    rowsNumber: number; //всего записей в таблице
+    rowsPerPage: number; //записей на страницу
+    page: number; //текущая страница
   };
 }
 
 type PaginateOptions = {
   page?: number;
-  perPage?: number;
+  rowsPerPage?: number;
 };
 type PaginateFunction = <T, K>(
   model: any,
@@ -19,29 +18,27 @@ type PaginateFunction = <T, K>(
 ) => Promise<PaginatedResult<T>>;
 
 export const createPaginator = (
-  defaultOptions: PaginateOptions = { page: 1, perPage: 10 },
+  defaultOptions: PaginateOptions = { page: 1, rowsPerPage: 10 },
 ): PaginateFunction => {
   return async (model, args: any = { where: undefined }, options) => {
     const page = options?.page || defaultOptions?.page,
-      perPage = options?.perPage || defaultOptions?.perPage,
-      skip = page > 1 ? perPage * (page - 1) : 0,
-      [rowsTotal, rows] = await Promise.all([
+      rowsPerPage = options?.rowsPerPage || defaultOptions?.rowsPerPage,
+      skip = page > 1 ? rowsPerPage * (page - 1) : 0,
+      [rowsNumber, rows] = await Promise.all([
         model.count({ where: args.where }),
         model.findMany({
           ...args,
-          take: perPage,
+          take: rowsPerPage,
           skip,
         }),
       ]);
-    const lastPage = Math.ceil(rowsTotal / perPage);
 
     return {
       rows,
       pageinfo: {
-        rowsTotal,
-        rowsPerPage: perPage,
-        lastPage,
-        currentPage: page,
+        rowsNumber,
+        rowsPerPage,
+        page,
       },
     };
   };

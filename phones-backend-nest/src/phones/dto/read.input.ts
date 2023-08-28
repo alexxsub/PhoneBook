@@ -19,7 +19,7 @@ export class inputRead {
 
   @Field({ description: 'Записей на страницу' })
   @IsNumber()
-  perPage: number;
+  rowsPerPage: number;
 
   @Field({ description: 'Запрашиваемая страница' })
   @IsNumber()

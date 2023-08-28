@@ -20,16 +20,13 @@ type Phone {
 """Записи телефонной книги, разбитые на страницы"""
 type PageInfo {
   """Всего записей в таблице"""
-  rowsTotal: Int!
+  rowsNumber: Int!
 
   """Записей на страницу"""
   rowsPerPage: Int!
 
-  """Последняя страница"""
-  lastPage: Int!
-
   """Текущая страница"""
-  currentPage: Int!
+  page: Int!
 }
 
 """Записи телефонной книги, разбитые на страницы"""
@@ -59,7 +56,7 @@ input inputRead {
   descending: String!
 
   """Записей на страницу"""
-  perPage: Float!
+  rowsPerPage: Float!
 
   """Запрашиваемая страница"""
   page: Float!

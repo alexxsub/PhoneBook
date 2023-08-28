@@ -4,13 +4,11 @@ import { Field, Int, ObjectType } from '@nestjs/graphql';
 @ObjectType({ description: 'Записи телефонной книги, разбитые на страницы' })
 class PageInfo {
   @Field(() => Int, { description: 'Всего записей в таблице' })
-  rowsTotal: number;
+  rowsNumber: number;
   @Field(() => Int, { description: 'Записей на страницу' })
   rowsPerPage: number;
-  @Field(() => Int, { description: 'Последняя страница' })
-  lastPage: number;
   @Field(() => Int, { description: 'Текущая страница' })
-  currentPage: number;
+  page: number;
 }
 
 @ObjectType({ description: 'Записи телефонной книги, разбитые на страницы' })
