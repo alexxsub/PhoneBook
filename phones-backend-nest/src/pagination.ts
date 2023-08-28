@@ -11,15 +11,15 @@ type PaginateOptions = {
   page?: number;
   rowsPerPage?: number;
 };
-type PaginateFunction = <T, K>(
+type PaginateFn = <T, K>(
   model: any,
   args?: K,
   options?: PaginateOptions,
 ) => Promise<PaginatedResult<T>>;
 
-export const createPaginator = (
+export const createPaginate = (
   defaultOptions: PaginateOptions = { page: 1, rowsPerPage: 10 },
-): PaginateFunction => {
+): PaginateFn => {
   return async (model, args: any = { where: undefined }, options) => {
     const page = options?.page || defaultOptions?.page,
       rowsPerPage = options?.rowsPerPage || defaultOptions?.rowsPerPage,

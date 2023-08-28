@@ -3,10 +3,9 @@ import { inputPhone } from './dto/phone.input';
 import { inputRead } from './dto/read.input';
 import { PrismaService } from '../prisma.service';
 import { Phone, Prisma } from '@prisma/client';
+import { UserInputError } from '@nestjs/apollo';
 
-// import { createPaginator } from 'prisma-pagination';
-
-import { createPaginator } from '../pagination';
+import { createPaginate } from '../pagination';
 
 @Injectable()
 export class PhoneService {
@@ -26,10 +25,11 @@ export class PhoneService {
       if (descending && descending != '')
         orderBy[sortBy] = Prisma.SortOrder[descending];
 
-      const paginate = createPaginator({ rowsPerPage });
+      const paginate = createPaginate({ rowsPerPage });
       const res = await paginate<Phone, Prisma.PhoneFindManyArgs>(
-        this.prisma.phone,
+        this.prisma.phone, //model
         {
+          //args
           where: {
             OR: [
               {
@@ -46,12 +46,12 @@ export class PhoneService {
           },
           orderBy,
         },
-        { page },
+        { page }, //options
       );
 
       return res;
     }
-    return await this.prisma.phone.findMany();
+    throw new UserInputError('Нет входных данных для расчета страниц');
   }
 
   async update(input: inputPhone): Promise<Phone> {
