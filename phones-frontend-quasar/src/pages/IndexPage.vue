@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, computed, watch, ref } from "vue";
+import { reactive, computed, watch, onMounted, ref } from "vue";
 
 //использование плагинов
 import { useQuasar, useDialogPluginComponent, Notify } from "quasar";
@@ -27,6 +27,13 @@ import {
 //глобальная переменная на простраство квазар
 const $q = useQuasar();
 
+const tableRef = ref();
+
+onMounted(() => {
+  // инициализация данных с сервера, 1 страница
+  tableRef.value.requestServerInteraction();
+});
+
 //объект состояния приложения
 const state = reactive({
   loading: false, //статус активного запроса
@@ -47,13 +54,6 @@ const state = reactive({
     rowsNumber: 0,
   },
 });
-// const pagination = ref({
-//   sortBy: "",
-//   descending: false,
-//   page: 1,
-//   rowsPerPage: 10,
-//   rowsNumber: 0,
-// });
 
 //описание столбцов таблицы
 const columns = [
@@ -91,23 +91,7 @@ const { result, loading, subscribeToMore, refetch } = useQuery(
   vars
 );
 
-/*
-const readPhone = async (variables) =>
-  apolloClient.query({
-    query: READ_PHONES,
-    variables: {
-      input: {
-        filter: state.filter,
-        sortBy: state.sortBy,
-        descending: state.descending,
-        rowsPerPage: state.rowsPerPage,
-        page: state.page,
-      },
-    },
-  });
-
-readPhone();
-*/
+// Подписки
 const onCreatedPhone = subscribeToMore({
   document: CREATED_PHONE,
   updateQuery: (previousData, { subscriptionData }) => {
@@ -148,9 +132,6 @@ watch(loading, (value) => {
 
 //массив с данными получаем с сервера  как результат выполнения запроса
 const phones = computed(() => result.value?.readPhones.rows ?? []);
-state.pagination.rowsNumber = computed(
-  () => result.value?.readPhones.pageinfo.rowsNumber ?? 0
-);
 
 //настраиваемая подпись кнопки добавить от размера экрана
 const btnAddLabel = computed(() => {
@@ -306,13 +287,16 @@ function onRequest(props) {
 
   vars.input.rowsPerPage = rowsPerPage;
 
-  refetch();
+  refetch().then((res) => {
+    state.pagination.rowsNumber = res.data.readPhones.pageinfo.rowsNumber;
+  });
 }
 </script>
 
 <template>
   <q-page>
     <q-table
+      ref="tableRef"
       :columns="columns"
       :loading="state.loading"
       :filter="state.filter"
