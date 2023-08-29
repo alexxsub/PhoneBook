@@ -1,5 +1,5 @@
 //для языка sdl
-import gql from 'graphql-tag'
+import gql from "graphql-tag";
 
 //Описание GraphQL запросы на sdl языке
 
@@ -10,57 +10,80 @@ const fragment = gql`
     name
     address
   }
-`
+`;
 //sdl запрос на чтение
 export const READ_PHONES = gql`
-query readPhones {
-  readPhones {
-    ...Phone
+  query readPhones($input: inputRead!) {
+    readPhones(input: $input) {
+      rows {
+        id
+        number
+        name
+        address
+      }
+      pageinfo {
+        rowsNumber
+        rowsPerPage
+        page
+      }
+    }
   }
-}${fragment}`;
+`;
 
 //описываем на sdl языке запрос на добавление
 export const CREATE_PHONE = gql`
-mutation createPhone ($input:inputPhone!) {
-  createPhone (input: $input) {
-    ...Phone
+  mutation createPhone($input: inputPhone!) {
+    createPhone(input: $input) {
+      ...Phone
+    }
   }
-}${fragment}`;
+  ${fragment}
+`;
 //описываем на sdl языке запрос на обновление
 //в качестве входного параметра объект по структуре как state.inputPhone
 export const UPDATE_PHONE = gql`
-mutation updatePhone ($input:inputPhone!) {
-  updatePhone (input: $input) {
-    ...Phone
+  mutation updatePhone($input: inputPhone!) {
+    updatePhone(input: $input) {
+      ...Phone
+    }
   }
-}${fragment}`;
+  ${fragment}
+`;
 
 //описываем на sdl языке запрос на удаление
 export const DELETE_PHONE = gql`
-mutation deletePhone ($id: String!) {
-  deletePhone (id: $id) {
-    ...Phone
+  mutation deletePhone($id: String!) {
+    deletePhone(id: $id) {
+      ...Phone
+    }
   }
-}${fragment}`;
+  ${fragment}
+`;
 
 //Запросы на подписку
 export const CREATED_PHONE = gql`
-subscription createdPhone {
-  createdPhone {
-    ...Phone
+  subscription createdPhone {
+    createdPhone {
+      ...Phone
+    }
   }
-}${fragment}`;
+  ${fragment}
+`;
 
 export const UPDATED_PHONE = gql`
-subscription updatedPhone {
-  updatedPhone {
-    ...Phone
+  subscription updatedPhone {
+    updatedPhone {
+      ...Phone
+    }
   }
-}${fragment}`;
+  ${fragment}
+`;
 
 export const DELETED_PHONE = gql`
-subscription deletedPhone {
-  deletedPhone {
-    ...Phone
+  subscription deletedPhone {
+    deletedPhone {
+      ...Phone
+    }
   }
-}${fragment}`;
+  ${fragment}
+`;
