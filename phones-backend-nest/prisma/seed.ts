@@ -1,28 +1,32 @@
+import { faker } from '@faker-js/faker';
+
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
-async function main() {
-  await prisma.phone.create({
-    data: {
-      number: '1111',
-      name: 'Люк Скайуокер',
-      address: '1111',
-    },
-  });
-  await prisma.phone.create({
-    data: {
-      number: '2222',
-      name: 'Дарт Вейдер',
-      address: '22222',
-    },
-  });
-  await prisma.phone.create({
-    data: {
-      number: '3333',
-      name: 'Падме Амидала',
-      address: '3333',
-    },
-  });
+
+function createRandomPhone() {
+  return {
+    name: faker.person.fullName(),
+    number: faker.phone.number('###-###-###'),
+    address: faker.location.streetAddress({ useFullAddress: true }),
+  };
 }
+
+const Phones = faker.helpers.multiple(createRandomPhone, {
+  count: 100,
+});
+
+//   createMany not support SQLite
+async function main() {
+  Phones.forEach(
+    async (phone) =>
+      await prisma.phone.create({
+        data: phone,
+      }),
+  );
+
+  console.log((await prisma.phone.count({})) + ' records!');
+}
+
 main()
   .then(async () => {
     await prisma.$disconnect();
