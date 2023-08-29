@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, computed, watch } from "vue";
+import { reactive, computed, watch, ref } from "vue";
 
 //использование плагинов
 import { useQuasar, useDialogPluginComponent, Notify } from "quasar";
@@ -39,7 +39,21 @@ const state = reactive({
     name: "",
     address: "",
   },
+  pagination: {
+    sortBy: "",
+    descending: false,
+    page: 1,
+    rowsPerPage: 10,
+    rowsNumber: 0,
+  },
 });
+// const pagination = ref({
+//   sortBy: "",
+//   descending: false,
+//   page: 1,
+//   rowsPerPage: 10,
+//   rowsNumber: 0,
+// });
 
 //описание столбцов таблицы
 const columns = [
@@ -61,25 +75,55 @@ const columns = [
   },
 ];
 
-//читаем данные, запрос на бэкенд
-const { result, loading, subscribeToMore } = useQuery(READ_PHONES);
+const vars = {
+  input: {
+    filter: "",
+    sortBy: "",
+    descending: false,
+    rowsPerPage: 10,
+    page: 1,
+  },
+};
 
+//читаем данные, запрос на бэкенд
+const { result, loading, subscribeToMore, refetch } = useQuery(
+  READ_PHONES,
+  vars
+);
+
+/*
+const readPhone = async (variables) =>
+  apolloClient.query({
+    query: READ_PHONES,
+    variables: {
+      input: {
+        filter: state.filter,
+        sortBy: state.sortBy,
+        descending: state.descending,
+        rowsPerPage: state.rowsPerPage,
+        page: state.page,
+      },
+    },
+  });
+
+readPhone();
+*/
 const onCreatedPhone = subscribeToMore({
   document: CREATED_PHONE,
   updateQuery: (previousData, { subscriptionData }) => {
     return {
       readPhones: [
-        ...previousData.readPhones,
+        ...previousData.readPhones.rows,
         subscriptionData.data.createdPhone,
       ],
     };
   },
 });
-const onUpdatedPhon = subscribeToMore({
+const onUpdatedPhone = subscribeToMore({
   document: UPDATED_PHONE,
   updateQuery: (previousData, { subscriptionData }) => {
     const id = subscriptionData.data.updatedPhone.id;
-    const res = previousData.readPhones.map((el) => {
+    const res = previousData.readPhones.rows.map((el) => {
       if (el.id === id) return subscriptionData.data.updatedPhone;
     });
     return {
@@ -87,12 +131,12 @@ const onUpdatedPhon = subscribeToMore({
     };
   },
 });
-const onDeletedPhon = subscribeToMore({
+const onDeletedPhone = subscribeToMore({
   document: DELETED_PHONE,
   updateQuery: (previousData, { subscriptionData }) => {
     const id = subscriptionData.data.deletedPhone.id;
     return {
-      readPhones: previousData.readPhones.filter((i) => i.id !== id),
+      readPhones: previousData.readPhones.rows.filter((i) => i.id !== id),
     };
   },
 });
@@ -103,7 +147,10 @@ watch(loading, (value) => {
 });
 
 //массив с данными получаем с сервера  как результат выполнения запроса
-const phones = computed(() => result.value?.readPhones ?? []);
+const phones = computed(() => result.value?.readPhones.rows ?? []);
+state.pagination.rowsNumber = computed(
+  () => result.value?.readPhones.pageinfo.rowsNumber ?? 0
+);
 
 //настраиваемая подпись кнопки добавить от размера экрана
 const btnAddLabel = computed(() => {
@@ -244,6 +291,23 @@ function resetPhone() {
     state.inputPhone[key] = "";
   }
 }
+
+function onRequest(props) {
+  const { page, rowsPerPage, sortBy, descending } = props.pagination;
+  //синхронизируем таблицу
+  state.pagination.sortBy = sortBy == null ? "" : sortBy;
+  state.pagination.descending = descending;
+  state.pagination.page = page;
+  state.pagination.rowsPerPage = rowsPerPage;
+  //заполняем данные для запроса на сервер
+  vars.input.filter = props.filter;
+  vars.input.sortBy = sortBy == null ? "" : sortBy;
+  vars.input.page = page;
+
+  vars.input.rowsPerPage = rowsPerPage;
+
+  refetch();
+}
 </script>
 
 <template>
@@ -253,9 +317,11 @@ function resetPhone() {
       :loading="state.loading"
       :filter="state.filter"
       :rows="phones"
+      v-model:pagination="state.pagination"
       no-data-label="Нет данных"
       no-results-label="Ничего не найдено"
       style="height: 93vh"
+      @request="onRequest"
     >
       <!--кастомный заголовок таблицы, чтобы вставить поле поиска-->
       <template v-slot:top>
