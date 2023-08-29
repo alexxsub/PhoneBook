@@ -2,7 +2,8 @@ import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
-// import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+//закоментировать для другой страницы песочницы
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { Context } from 'graphql-ws';
 
 @Module({
@@ -20,15 +21,17 @@ import { Context } from 'graphql-ws';
         },
       },
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-      playground: true,
-      // playground:false,
+      // поменять значение для песочницы
+      // playground: true,
+      playground: false,
       plugins: [
         {
           async serverWillStart() {
             console.log('🚀 Apollo Started!');
           },
         },
-        // ApolloServerPluginLandingPageLocalDefault(),
+        //закоментировать
+        ApolloServerPluginLandingPageLocalDefault(),
       ],
     }),
   ],

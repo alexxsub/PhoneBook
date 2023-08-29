@@ -1,5 +1,5 @@
-import { InputType, Field } from '@nestjs/graphql';
-import { IsEmpty, IsString, IsNumber } from 'class-validator';
+import { InputType, Field, Int } from '@nestjs/graphql';
+import { IsEmpty, IsNotEmpty, IsString, IsNumber } from 'class-validator';
 
 @InputType()
 export class inputRead {
@@ -14,14 +14,14 @@ export class inputRead {
   sortBy: string;
 
   @Field({ description: 'Направление сортировки ' })
-  @IsEmpty()
-  descending: string;
+  @IsNotEmpty()
+  descending: boolean;
 
-  @Field({ description: 'Записей на страницу' })
+  @Field(() => Int, { description: 'Записей на страницу' })
   @IsNumber()
   rowsPerPage: number;
 
-  @Field({ description: 'Запрашиваемая страница' })
+  @Field(() => Int, { description: 'Запрашиваемая страница' })
   @IsNumber()
   page: number;
 }

@@ -53,13 +53,13 @@ input inputRead {
   sortBy: String!
 
   """Направление сортировки """
-  descending: String!
+  descending: Boolean!
 
   """Записей на страницу"""
-  rowsPerPage: Float!
+  rowsPerPage: Int!
 
   """Запрашиваемая страница"""
-  page: Float!
+  page: Int!
 }
 
 type Mutation {

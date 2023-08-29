@@ -22,8 +22,9 @@ export class PhoneService {
     if (input) {
       const { rowsPerPage, page, filter, sortBy, descending } = input;
       const orderBy = {};
-      if (descending && descending != '')
-        orderBy[sortBy] = Prisma.SortOrder[descending];
+
+      if (sortBy != '')
+        orderBy[sortBy] = Prisma.SortOrder[descending ? 'desc' : 'asc'];
 
       const paginate = createPaginate({ rowsPerPage });
       const res = await paginate<Phone, Prisma.PhoneFindManyArgs>(
